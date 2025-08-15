@@ -63,17 +63,48 @@ function activate(context) {
     context.subscriptions.push(disposable);
 }
 function getWebviewContent(context, webview) {
-    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'dist', 'webview.js'));
+    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'dist', 'script.js'));
     return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-    <body>
-        <div id="root"></div>
-		<h1>Welcome to Chat Mode</h1>
-		<script src="${scriptUri}"></script>
-    </body>
-    </html>
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
+  <title>Copilot-like UI</title>  
+  <link rel="stylesheet" href="style.css" />  
+  <script src="${scriptUri}"></script>  
+</head>  
+<body>  
+  <div class="container">  
+    <!-- Sidebar -->  
+    <aside class="sidebar">  
+      <h2>🤖 ERIS expert</h2>  
+      <nav>  
+        <ul>  
+          <li class="active">Ask me anything about eris codebase</li>
+        </ul>  
+      </nav>  
+    </aside>  
+  
+    <!-- Main Chat Area -->  
+    <main class="chat-area">  
+      <div class="messages" id="messages">  
+        <!-- Messages will be dynamically added here -->  
+        <div class="message bot">  
+          <div class="avatar">🤖</div>  
+          <div class="bubble">Hello! How can I help you today?</div>  
+        </div>  
+      </div>  
+  
+      <!-- Input Box -->  
+      <div class="input-area">  
+        <input type="text" id="chatInput" placeholder="Type your question here..." />  
+        <button id="sendBtn">➤</button>  
+      </div>  
+    </main>  
+  </div>  
+</body>  
+</html>  
     `;
 }
 // This method is called when your extension is deactivated
