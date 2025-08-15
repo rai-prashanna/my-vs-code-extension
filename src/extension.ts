@@ -6,10 +6,52 @@ import * as vscode from 'vscode';
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "openchatmode" is now active!');
+	// Create inline completion provider, this makes suggestions inline
+	const provider: vscode.InlineCompletionItemProvider = {
+		provideInlineCompletionItems: async (
+			document: vscode.TextDocument,
+			position: vscode.Position,
+			contextInline: vscode.InlineCompletionContext,
+			token: vscode.CancellationToken
+		): Promise<vscode.InlineCompletionItem[]> => {
+			const editor = vscode.window.activeTextEditor;
+			if (!editor) return [];
 
+			const selection = editor.selection;
+			const manualKind = 0;
+			const manuallyTriggered = contextInline.triggerKind === manualKind;
+
+			// If highlighted back to front, put cursor at the end and rerun
+			if (manuallyTriggered && position.isEqual(selection.start)) {
+				editor.selection = new vscode.Selection(selection.start, selection.end);
+				vscode.commands.executeCommand("editor.action.inlineSuggest.trigger");
+				return [];
+			}
+
+			// On activation send highlighted text to LLM for suggestions
+			if (manuallyTriggered && !selection.isEmpty) {
+				const selectionRange = new vscode.Range(selection.start, selection.end);
+				const highlighted = editor.document.getText(selectionRange);
+
+				const payload = { data: highlighted };
+				console.log("Sending payload to LLM API: ", highlighted);
+
+				const response = await fetch('http://127.0.0.1:8000/complete/', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(payload),
+				});
+
+				const responseText: string = (await response.json()).code;
+				console.log("\nThe response is ", responseText);
+
+				const range = new vscode.Range(selection.end, selection.end);
+				return [{ insertText: "\n" + responseText, range }];
+			}
+
+			return [];
+		},
+	};
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
@@ -28,6 +70,11 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+    	// Add provider to Ruby files
+	vscode.languages.registerInlineCompletionItemProvider(
+		{ scheme: 'file', language: 'ruby' },
+		provider
+	);
 }
 function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview) {
     const scriptUri = webview.asWebviewUri(

@@ -9,13 +9,20 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": ["onCommand:editor.action.inlineSuggest.trigger"],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "openchatmode",
         "title": "Open Chat Mode"
+      }
+    ],
+        "keybindings": [
+      {
+        "key": "Shift+s",
+        "command": "editor.action.inlineSuggest.trigger",
+        "mac": "Shift+s"
       }
     ]
   },
