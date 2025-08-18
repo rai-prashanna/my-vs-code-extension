@@ -9,8 +9,10 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": ["onCommand:editor.action.inlineSuggest.trigger"],
-  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onCommand:editor.action.inlineSuggest.trigger"
+  ],
+  "main": "./dist/second-extension.js",
   "contributes": {
     "commands": [
       {
@@ -18,7 +20,7 @@
         "title": "Open Chat Mode"
       }
     ],
-        "keybindings": [
+    "keybindings": [
       {
         "key": "Shift+s",
         "command": "editor.action.inlineSuggest.trigger",
@@ -48,14 +50,20 @@
     "@typescript-eslint/parser": "^8.39.0",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
+    "css-loader": "^7.1.2",
     "eslint": "^9.32.0",
+    "style-loader": "^4.0.0",
     "ts-loader": "^9.5.2",
     "typescript": "^5.9.2",
     "webpack": "^5.101.1",
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
+    "highlight.js": "^11.11.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-markdown": "^10.1.0",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1"
   }
 }
