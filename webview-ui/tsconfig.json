@@ -1,10 +1,17 @@
 {
   "compilerOptions": {
     "target": "ES2017",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": true,
     "module": "esnext",
     "jsx": "react",
     "strict": true,
     "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "noEmit": false,
     "skipLibCheck": true
   },
   "include": ["./**/*"]

@@ -55,11 +55,16 @@ const reactConfig =   {
     },
     resolve: { extensions: ['.ts', '.tsx', '.js'] },
     module: {
-      rules: [{ test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },      
+      rules: [
+        { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },      
         {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader'], // <-- add this
-      }],
+      },
+          {
+        test: /\.svg$/,
+        type: 'asset/resource', // Webpack 5 way
+      },],
     },
     mode: 'development',
   };
