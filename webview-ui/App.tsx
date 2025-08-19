@@ -276,13 +276,30 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState("");
 
-  const load = () => {
+  const load = async () => {
     setLoading(true);
+    try {
+      const response = await fetch("https://dummyjson.com/todos/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          todo: "Use DummyJSON in the project",
+          completed: false,
+          userId: value,
+        }), // send value here
+      });
 
-    setTimeout(() => {
+      const data = await response.json();
+      console.log("API response:", data);
+    } catch (err) {
+      console.error("Error:", err);
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
+
   const headerTemplate = () => {
     const className = `justify-content-space-between`;
 
