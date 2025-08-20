@@ -21,6 +21,7 @@ import { Tooltip } from "primereact/tooltip";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Card } from "primereact/card";
+import { Divider } from "primereact/divider";
 
 const markdown = `Answer Concise summary
 - SSO is implemented with Devise + OmniAuth-style callbacks routed to a custom OmniauthCallbacksController. Provider metadata (SAML vs OAuth2, domain lists, client ids/secrets, slo URL) lives in SsoProvider records and is accessed via SsoProvider.get_sso_provider_by_email.
@@ -305,7 +306,7 @@ export default function App() {
   const headerTemplate = () => {
     const className = `justify-content-space-between`;
     return (
-      <div >
+      <div>
         <div className="flex">
           <Image
             className="mt-2 ml-2 inline"
@@ -322,29 +323,43 @@ export default function App() {
   return (
     <PrimeReactProvider>
       <div>
-        <Card title="Ask me anything about eris codebase" header={headerTemplate}>
-          {answer && <MarkdownRenderer content={answer} />}
+        <Card
+          title="Ask me anything about eris codebase"
+          header={headerTemplate}
+        >
+          {answer && (
+            <div>
+              <Divider />
+              <MarkdownRenderer content={markdown1} />
+            </div>
+          )}
         </Card>
         {/* <ReactMarkdown
         children={markdown}
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight]}
       /> */}
-      {loading && <ProgressBar mode="indeterminate" style={{ height: "6px", width: "100%"  }} />}
-       
-        <div className="flex">
+        {loading && (
+          <ProgressBar
+            mode="indeterminate"
+            style={{ height: "6px", width: "100%" }}
+          />
+        )}
+
+        <div className="flex items-center">
           <InputText
-            className="inline m-1 w-10"
+            className="flex-1 m-1"
             value={value}
-            onChange={(e) => setValue(e.target.value) }
-          placeholder="Type your question here..." />
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="Type your question here..."
+          />
           <Button
-            className="inline m-1 w-1.5"
+            className="m-1 bg-primary text-cyan-500"
             label="Submit"
             icon="pi pi-check"
             loading={loading}
             onClick={load}
-          />  
+          />
         </div>
       </div>
     </PrimeReactProvider>
