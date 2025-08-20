@@ -12,6 +12,7 @@
   "activationEvents": [
     "onCommand:editor.action.inlineSuggest.trigger"
   ],
+  
   "main": "./dist/second-extension.js",
   "contributes": {
     "commands": [
@@ -22,9 +23,9 @@
     ],
     "keybindings": [
       {
-        "key": "Shift+s",
+        "key": "shift+s",
         "command": "editor.action.inlineSuggest.trigger",
-        "mac": "Shift+s"
+        "mac": "shift+s"
       }
     ]
   },
