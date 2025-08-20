@@ -20,6 +20,7 @@ import { Button } from "primereact/button";
 import { Tooltip } from "primereact/tooltip";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
+import { Card } from "primereact/card";
 
 const markdown = `Answer Concise summary
 - SSO is implemented with Devise + OmniAuth-style callbacks routed to a custom OmniauthCallbacksController. Provider metadata (SAML vs OAuth2, domain lists, client ids/secrets, slo URL) lives in SsoProvider records and is accessed via SsoProvider.get_sso_provider_by_email.
@@ -275,28 +276,29 @@ print(greet("Prashanna"))
 export default function App() {
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState("");
+  const [answer, setAnswer] = useState("");
 
   const load = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://dummyjson.com/todos/add", {
+      const response = await fetch("http://127.0.0.1:8000/qa", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          todo: "Use DummyJSON in the project",
-          completed: false,
-          userId: value,
-        }), // send value here
+          data: value,
+        }),
       });
 
       const data = await response.json();
       console.log("API response:", data);
+      setAnswer(data.data);
     } catch (err) {
       console.error("Error:", err);
     } finally {
       setLoading(false);
+      setValue("");
     }
   };
 
@@ -305,10 +307,14 @@ export default function App() {
 
     return (
       <div className={className}>
-        <div className="flex align-items-center gap-2">
-          <Image className="mt-5" src={Robot} width="60px" height="40px" />
-
-          <span className="font-bold">Bot</span>
+        <div className="flex">
+          <Image
+            className="mt-2 mr-2 inline"
+            src={Robot}
+            width="60px"
+            height="40px"
+          />
+          <span className="font-bold inline">Bot</span>
         </div>
       </div>
     );
@@ -317,16 +323,16 @@ export default function App() {
   return (
     <PrimeReactProvider>
       <div>
-        <Panel headerTemplate={headerTemplate}>
-          <div className="p-4">
-            <MarkdownRenderer content={markdown1} />
-          </div>
-        </Panel>
+        <Card title="Advanced Card" header={headerTemplate}>
+          {answer && <MarkdownRenderer content={answer} />}
+        </Card>
         {/* <ReactMarkdown
         children={markdown}
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight]}
       /> */}
+      {loading && <ProgressBar mode="indeterminate" style={{ height: "6px", width: "100%"  }} />}
+       
         <div className="flex">
           <InputText
             className="inline m-1 w-10"
@@ -339,7 +345,7 @@ export default function App() {
             icon="pi pi-check"
             loading={loading}
             onClick={load}
-          />
+          />  
         </div>
       </div>
     </PrimeReactProvider>
