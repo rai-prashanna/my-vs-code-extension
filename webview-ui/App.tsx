@@ -304,17 +304,16 @@ export default function App() {
 
   const headerTemplate = () => {
     const className = `justify-content-space-between`;
-
     return (
-      <div className={className}>
+      <div >
         <div className="flex">
           <Image
-            className="mt-2 mr-2 inline"
+            className="mt-2 ml-2 inline"
             src={Robot}
             width="60px"
             height="40px"
           />
-          <span className="font-bold inline">Bot</span>
+          <span className="ml-2 mt-4 font-bold inline">ERIS expert</span>
         </div>
       </div>
     );
@@ -323,7 +322,7 @@ export default function App() {
   return (
     <PrimeReactProvider>
       <div>
-        <Card title="Advanced Card" header={headerTemplate}>
+        <Card title="Ask me anything about eris codebase" header={headerTemplate}>
           {answer && <MarkdownRenderer content={answer} />}
         </Card>
         {/* <ReactMarkdown
@@ -337,8 +336,8 @@ export default function App() {
           <InputText
             className="inline m-1 w-10"
             value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
+            onChange={(e) => setValue(e.target.value) }
+          placeholder="Type your question here..." />
           <Button
             className="inline m-1 w-1.5"
             label="Submit"
