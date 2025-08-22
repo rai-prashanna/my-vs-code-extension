@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -276,8 +276,11 @@ print(greet("Prashanna"))
 `;
 export default function App() {
   const [loading, setLoading] = useState(false);
-  const [value, setValue] = useState("");
+  const [question, setQuestion] = useState("");
+  const [asked, setAsked] = useState("");
+
   const [answer, setAnswer] = useState("");
+  let myTuple: [number, Map<string, number>];
 
   const load = async () => {
     setLoading(true);
@@ -288,7 +291,7 @@ export default function App() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          data: value,
+          data: question,
         }),
       });
 
@@ -299,7 +302,8 @@ export default function App() {
       console.error("Error:", err);
     } finally {
       setLoading(false);
-      setValue("");
+      setAsked(question);
+      setQuestion("");
     }
   };
 
@@ -320,6 +324,11 @@ export default function App() {
     );
   };
 
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    load();
+  };
+
   return (
     <PrimeReactProvider>
       <div>
@@ -329,8 +338,9 @@ export default function App() {
         >
           {answer && (
             <div>
+              <div>🤩 {asked}</div>
               <Divider />
-              <MarkdownRenderer content={markdown1} />
+              <MarkdownRenderer content={answer} />
             </div>
           )}
         </Card>
@@ -345,22 +355,23 @@ export default function App() {
             style={{ height: "6px", width: "100%" }}
           />
         )}
-
-        <div className="flex items-center">
-          <InputText
-            className="flex-1 m-1"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder="Type your question here..."
-          />
-          <Button
-            className="m-1 bg-primary text-cyan-500"
-            label="Submit"
-            icon="pi pi-check"
-            loading={loading}
-            onClick={load}
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="flex items-center mt-2 ">
+            <InputText
+              className="flex-1 m-1"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Type your question here..."
+            />
+            <Button
+              className="m-1 bg-primary text-cyan-500"
+              label="Submit"
+              icon="pi pi-check"
+              loading={loading}
+              onClick={load}
+            />
+          </div>
+        </form>
       </div>
     </PrimeReactProvider>
   );
