@@ -120,7 +120,7 @@ pre {
 }  
   
 .input-area button {  
-  background-color: #0078ff;  
+  background-color: #3279a8;  
   color: white;  
   border: none;  
   padding: 0 16px;  
@@ -131,7 +131,7 @@ pre {
 }  
   
 .input-area button:hover {  
-  background-color: #005fcc;  
+  background-color: #3279a8;  
 }  
   
 /* Animation */  

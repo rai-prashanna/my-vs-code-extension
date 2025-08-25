@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FormEvent } from "react";
+import React, { useState, useRef, useEffect, FormEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -279,32 +279,49 @@ export default function App() {
   const [question, setQuestion] = useState("");
   const [asked, setAsked] = useState("");
 
+  const [isStreaming, setIsStreaming] = useState<boolean>(false);
+  const wsRef = useRef<WebSocket | null>(null);
+
   const [answer, setAnswer] = useState("");
   let myTuple: [number, Map<string, number>];
 
-  const load = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("http://127.0.0.1:8000/qa", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          data: question,
-        }),
-      });
+  useEffect(() => {
+    const ws = new WebSocket("ws://127.0.0.1:8000/ws/stream");
+    wsRef.current = ws;
 
-      const data = await response.json();
-      console.log("API response:", data);
-      setAnswer(data.data);
-    } catch (err) {
-      console.error("Error:", err);
-    } finally {
-      setLoading(false);
-      setAsked(question);
-      setQuestion("");
-    }
+    ws.onmessage = (event: MessageEvent) => {
+      // Check if this is the last message
+      if (event.data === "#*✋🛑*#") {
+        setLoading(false); // hide progress bar
+        setIsStreaming(false); // stop streaming
+      } else {
+        setAnswer((prev) => prev + event.data);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("✅ WebSocket closed");
+    };
+
+    // disconnect only when window/tab is closed
+    const handleBeforeUnload = () => {
+      ws.close();
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isStreaming]);
+
+  const load = () => {
+    setLoading(true);
+    wsRef.current?.send("START_🎬");
+    //   setLoading(false);
+    //   setQuestion("");
+    setAsked(question);
+    setIsStreaming(true);
+    //   setAsked(question);
   };
 
   const headerTemplate = () => {
@@ -338,7 +355,12 @@ export default function App() {
         >
           {answer && (
             <div>
-              <div>🤩 {asked}</div>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <div>🤩</div>
+                <div>{asked}</div>
+              </div>
               <Divider />
               <MarkdownRenderer content={answer} />
             </div>
