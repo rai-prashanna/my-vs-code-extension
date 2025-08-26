@@ -12,7 +12,6 @@ type MarkdownRendererProps = {
 };
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
-
   return (
     <div className="markdown-body">
       <ReactMarkdown>{content}</ReactMarkdown>
