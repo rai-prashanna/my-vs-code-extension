@@ -22,6 +22,9 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
+import { CSSTransition } from 'react-transition-group';
+import './fade.css'; // We'll define the fade CSS here
+
 
 const markdown = `Answer Concise summary
 - SSO is implemented with Devise + OmniAuth-style callbacks routed to a custom OmniauthCallbacksController. Provider metadata (SAML vs OAuth2, domain lists, client ids/secrets, slo URL) lives in SsoProvider records and is accessed via SsoProvider.get_sso_provider_by_email.
@@ -286,7 +289,7 @@ export default function App() {
   let myTuple: [number, Map<string, number>];
 
   useEffect(() => {
-    const ws = new WebSocket("ws://127.0.0.1:8000/ws/stream");
+    const ws = new WebSocket("ws://127.0.0.1:8000/ws/qa/stream");
     wsRef.current = ws;
 
     ws.onmessage = (event: MessageEvent) => {
@@ -316,7 +319,8 @@ export default function App() {
 
   const load = () => {
     setLoading(true);
-    wsRef.current?.send("START_🎬");
+    var raw_data=JSON.stringify({identifier: "START_🎬",question: question})
+    wsRef.current?.send(raw_data);
     //   setLoading(false);
     //   setQuestion("");
     setAsked(question);

@@ -12,7 +12,6 @@
   "activationEvents": [
     "onCommand:editor.action.inlineSuggest.trigger"
   ],
-  
   "main": "./dist/second-extension.js",
   "contributes": {
     "commands": [
@@ -60,6 +59,7 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
+    "dompurify": "^3.2.6",
     "highlight.js": "^11.11.1",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
@@ -68,6 +68,7 @@
     "react-dom": "^19.1.1",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^15.6.1",
+    "react-transition-group": "^4.4.5",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1"
   }
