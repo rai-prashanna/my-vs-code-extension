@@ -289,7 +289,7 @@ export default function App() {
   let myTuple: [number, Map<string, number>];
 
   useEffect(() => {
-    const ws = new WebSocket("ws://127.0.0.1:8000/ws/qa/stream");
+    const ws = new WebSocket("ws://127.0.0.1:8000/ws/stream");
     wsRef.current = ws;
 
     ws.onmessage = (event: MessageEvent) => {
@@ -357,6 +357,7 @@ export default function App() {
           title="Ask me anything about eris codebase"
           header={headerTemplate}
         >
+          
           {answer && (
             <div>
               <div
