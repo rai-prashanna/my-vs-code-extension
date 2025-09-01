@@ -18,3 +18,12 @@ body {
     border-radius: 10px;
     margin-bottom: 1rem;
 }
+
+.markdown-body code {
+  background-color: #f5f5f5; /* light gray background */
+  color: #100d0e;           /* nice readable color */
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: 'Fira Code', monospace; /* or any monospace font */
+  font-size: 0.9em;
+}

@@ -24,6 +24,7 @@ import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
 import { CSSTransition } from 'react-transition-group';
 import './fade.css'; // We'll define the fade CSS here
+import QAComponent from "./QAComponent";
 
 
 const markdown = `Answer Concise summary
@@ -360,14 +361,7 @@ export default function App() {
           
           {answer && (
             <div>
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-              >
-                <div>🤩</div>
-                <div>{asked}</div>
-              </div>
-              <Divider />
-              <MarkdownRenderer content={answer} />
+          <QAComponent asked={asked} answer={answer}></QAComponent>
             </div>
           )}
         </Card>
