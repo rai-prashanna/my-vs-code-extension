@@ -22,10 +22,9 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
-import { CSSTransition } from 'react-transition-group';
-import './fade.css'; // We'll define the fade CSS here
-import QAComponent from "./QAComponent";
-
+import { CSSTransition } from "react-transition-group";
+import "./fade.css"; // We'll define the fade CSS here
+import QAComponent, { QAItem } from "./QAComponent";
 
 const markdown = `Answer Concise summary
 - SSO is implemented with Devise + OmniAuth-style callbacks routed to a custom OmniauthCallbacksController. Provider metadata (SAML vs OAuth2, domain lists, client ids/secrets, slo URL) lives in SsoProvider records and is accessed via SsoProvider.get_sso_provider_by_email.
@@ -278,6 +277,7 @@ def greet(name):
 print(greet("Prashanna"))
 \`\`\`
 `;
+
 export default function App() {
   const [loading, setLoading] = useState(false);
   const [question, setQuestion] = useState("");
@@ -285,9 +285,20 @@ export default function App() {
 
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const wsRef = useRef<WebSocket | null>(null);
-
   const [answer, setAnswer] = useState("");
-  let myTuple: [number, Map<string, number>];
+  const [qaList, setQaList] = useState<QAItem[]>([]);
+
+  const addQA = (newQA: QAItem): void => {
+    setQaList((prev) => [...prev, newQA]);
+  };
+
+  const updateAnswer = (index: number, chunk: string): void => {
+    setQaList((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, answer: item.answer + chunk } : item
+      )
+    );
+  };
 
   useEffect(() => {
     const ws = new WebSocket("ws://127.0.0.1:8000/ws/stream");
@@ -298,8 +309,10 @@ export default function App() {
       if (event.data === "#*✋🛑*#") {
         setLoading(false); // hide progress bar
         setIsStreaming(false); // stop streaming
+        
       } else {
         setAnswer((prev) => prev + event.data);
+        updateAnswer(qaList.length, event.data); 
       }
     };
 
@@ -320,13 +333,14 @@ export default function App() {
 
   const load = () => {
     setLoading(true);
-    var raw_data=JSON.stringify({identifier: "START_🎬",question: question})
+    var raw_data = JSON.stringify({
+      identifier: "START_🎬",
+      question: question,
+    });
     wsRef.current?.send(raw_data);
-    //   setLoading(false);
-    //   setQuestion("");
     setAsked(question);
     setIsStreaming(true);
-    //   setAsked(question);
+    addQA({ asked: question, answer: "" });
   };
 
   const headerTemplate = () => {
@@ -358,10 +372,12 @@ export default function App() {
           title="Ask me anything about eris codebase"
           header={headerTemplate}
         >
-          
           {answer && (
             <div>
-          <QAComponent asked={asked} answer={answer}></QAComponent>
+              {qaList.map((qa, index) => (
+                <QAComponent asked={qa.asked} answer={qa.answer} />
+              ))}
+              {/* <QAComponent asked={asked} answer={answer}></QAComponent> */}
             </div>
           )}
         </Card>

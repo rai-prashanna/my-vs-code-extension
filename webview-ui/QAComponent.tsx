@@ -4,12 +4,12 @@ import { Divider } from "primereact/divider";
 import React from "react";
 import MarkdownRenderer from "./MarkdownRenderer";
 
-export type QAProps = {
+export type QAItem = {
   asked: string;
   answer: string;
 };
 
-const QAComponent: React.FC<QAProps> = ({ asked, answer }) => {
+const QAComponent: React.FC<QAItem> = ({ asked, answer }) => {
   return (
     <div>
       <Divider />
