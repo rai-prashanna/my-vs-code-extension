@@ -25,6 +25,7 @@ import { Divider } from "primereact/divider";
 import { CSSTransition } from "react-transition-group";
 import "./fade.css"; // We'll define the fade CSS here
 import QAComponent, { QAItem } from "./QAComponent";
+import SpinnerComponent from "./MySpinner";
 
 const markdown = `Answer Concise summary
 - SSO is implemented with Devise + OmniAuth-style callbacks routed to a custom OmniauthCallbacksController. Provider metadata (SAML vs OAuth2, domain lists, client ids/secrets, slo URL) lives in SsoProvider records and is accessed via SsoProvider.get_sso_provider_by_email.
@@ -392,6 +393,7 @@ export default function App() {
             style={{ height: "6px", width: "100%" }}
           />
         )}
+        {loading && (<SpinnerComponent loading={answer === ''}/>)}
         <form onSubmit={handleSubmit}>
           <div className="flex items-center mt-2 ">
             <InputText
