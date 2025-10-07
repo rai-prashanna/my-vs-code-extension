@@ -26,7 +26,6 @@ import { CSSTransition } from "react-transition-group";
 import "./fade.css"; // We'll define the fade CSS here
 import QAComponent, { QAItem } from "./QAComponent";
 import SpinnerComponent from "./MySpinner";
-import MermaidChart from "./MermaidChart";
 
 const markdown = `Answer Concise summary
 - SSO is implemented with Devise + OmniAuth-style callbacks routed to a custom OmniauthCallbacksController. Provider metadata (SAML vs OAuth2, domain lists, client ids/secrets, slo URL) lives in SsoProvider records and is accessed via SsoProvider.get_sso_provider_by_email.
@@ -303,7 +302,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    const ws = new WebSocket("ws://127.0.0.1:8000/ws/stream");
+    const ws = new WebSocket("ws://127.0.0.1:8000/ws/qa/stream");
     wsRef.current = ws;
 
     ws.onmessage = (event: MessageEvent) => {
@@ -366,86 +365,48 @@ export default function App() {
     e.preventDefault();
     load();
   };
-  
-  const sampleDiagram = `
-
-# Detailed reasoning and mapping to code
-- SessionsController (web Devise sessions)
-  - On sign-in (create), if the commit is SSO sign-in it finds provider_name via SsoProvider.get_sso_provider_by_email(params[:username]) and redirect_post to "/users/auth/#{provider_name}" — this is how standard login UI redirects into the provider/OmniAuth flow.
-  - On successful local sign-in, it sets cookies.permanent.encrypted[:username], queues UpdateTrackedFieldsJob, and handles subscription checks.
-  - destroy (logout) preserves saml_uid/saml_session_index, calls generate_local_slo_logout_url (uses SsoProvider.get_sso_provider_by_email on current_user to derive provider and check idp_slo_target_url), deletes cookies, invalidates sessions, and then uses Devise’s sign out flow. After sign out it stores slo_logout_url in the session so after Devise clears the session the app can still redirect to the provider logout URL in after_sign_out_path_for.
-
-\`\`\`mermaid
-graph TB  
-  subgraph Client  
-    direction TB  
-    Frontend["Frontend:Rails+React SPA"]:::client  
-  end  
-  
-  subgraph Backend  
-    direction TB  
-    Controller["Backend Controllers(app/controllers/*)"]:::backend  
-    Services["Backend Services(app/services/*)"]:::backend  
-    Models["Backend Models(app/models/*)"]:::backend  
-    Jobs["BackgroundJobs(app/jobs/*)"]:::backend  
-  end  
-  
-  subgraph Data  
-    direction TB  
-    PostgreSQL["PostgreSQL (pg)"]:::data  
-    Redis["Redis (cache/queue)"]:::data  
-    MinIO["MinIO/S3-compatible Storage"]:::data  
-    ClamAV["ClamAV"]:::data  
-  end  
-  
-  subgraph Infra  
-    direction TB  
-    Docker["Docker Containerization"]:::infra  
-    Registry["Image Registry(AWS/ECR)"]:::infra  
-    Kubernetes["Kubernetes/EKS(Helm)"]:::infra  
-    AzurePipelines["AzurePipelines"]:::infra  
-  end  
-  
-  subgraph External  
-    direction TB  
-    Twilio["Twilio-Ruby (SMS/Voice)"]:::external  
-    NewRelic["NewRelic"]:::external  
-    Errbit["Errbit"]:::external  
-  end  
-  
-  Frontend -->|REST API| Controller  
-  Controller -->|delegate to| Services  
-  Services -->|calls| Models  
-  Models -->|SQL| PostgreSQL  
-  Services -->|cache| Redis  
-  Services -->|enqueue| Jobs  
-  Jobs -->|execute| Models  
-  Controller -->|uploads| MinIO  
-  Services -->|scan| ClamAV  
-  Controller -->|notify| Twilio  
-  Services -->|metrics/traces| NewRelic  
-  Controller -->|log errors| Errbit  
-  
-  Docker -->|build/push image| Registry  
-  Registry -->|deploy to| Kubernetes    
-  AzurePipelines -->|build/push| Docker  
-  
-  classDef client fill:#ADD8E6,color:#000000;
-  classDef backend fill:#98FB98,color:#000000;
-  classDef data fill:#FFFACD,color:#000000;
-  classDef infra fill:#FFB6C1,color:#000000;
-  classDef external fill:#D3D3D3,color:#000000;
-
-`;
-
-const parts = sampleDiagram.split(/```mermaid/);
-const textBeforeMermaid = parts[0].trim();
-const mermaidCode = parts[1]?.replace(/```$/, '').trim();
 
   return (
     <PrimeReactProvider>
-      <MarkdownRenderer content={textBeforeMermaid} />
-      <MermaidChart chart={mermaidCode} />
+      <div>
+        <Card
+          title="Ask me anything about eris codebase"
+          header={headerTemplate}
+        >
+          {answer && (
+            <div>
+              {qaList.map((qa, index) => (
+                <QAComponent asked={qa.asked} answer={qa.answer} />
+              ))}
+              {/* <QAComponent asked={asked} answer={answer}></QAComponent> */}
+            </div>
+          )}
+        </Card>
+        {loading && (
+          <ProgressBar
+            mode="indeterminate"
+            style={{ height: "6px", width: "100%" }}
+          />
+        )}
+        {loading && (<SpinnerComponent loading={answer === ''}/>)}
+        <form onSubmit={handleSubmit}>
+          <div className="flex items-center mt-2 ">
+            <InputText
+              className="flex-1 m-1"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Type your question here..."
+            />
+            <Button
+              className="m-1 bg-primary text-cyan-500"
+              label="Submit"
+              icon="pi pi-check"
+              loading={loading}
+              onClick={load}
+            />
+          </div>
+        </form>
+      </div>
     </PrimeReactProvider>
   );
 }
