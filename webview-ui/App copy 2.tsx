@@ -152,7 +152,7 @@ const markdown1 = `Answer Concise summary
 - Web session cookies: Devise sign-in plus a permanent encrypted :username cookie (for ActionCable). API token rotation/revocation is handled by AuthTokenService and direct manipulation of user.authentication_token in API controllers.
 - SLO / logout: SessionsController preserves SAML session info to perform a local SLO redirect if provider.idp_slo_target_url is present; it also clears cookies and invalidates sessions. API logout clears authentication_token and resets session.
 
-Detailed reasoning and mapping to code
+# Detailed reasoning and mapping to code
 
 1) Controllers and modules that handle SSO login and callback flows
 - OmniauthCallbacksController (primary callback handler)
@@ -366,9 +366,7 @@ export default function App() {
     e.preventDefault();
     load();
   };
-  
-  const sampleDiagram = `
-
+const sampleDiagram = `
 # Detailed reasoning and mapping to code
 - SessionsController (web Devise sessions)
   - On sign-in (create), if the commit is SSO sign-in it finds provider_name via SsoProvider.get_sso_provider_by_email(params[:username]) and redirect_post to "/users/auth/#{provider_name}" — this is how standard login UI redirects into the provider/OmniAuth flow.
@@ -437,15 +435,18 @@ graph TB
   classDef external fill:#D3D3D3,color:#000000;
 
 `;
-
 const parts = sampleDiagram.split(/```mermaid/);
 const textBeforeMermaid = parts[0].trim();
 const mermaidCode = parts[1]?.replace(/```$/, '').trim();
 
   return (
     <PrimeReactProvider>
+      <div>
+    <div style={{ padding: '2rem' }}>
       <MarkdownRenderer content={textBeforeMermaid} />
       <MermaidChart chart={mermaidCode} />
+    </div>
+      </div>
     </PrimeReactProvider>
   );
 }

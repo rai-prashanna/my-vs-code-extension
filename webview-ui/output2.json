@@ -1,0 +1,61 @@
+{
+  "Summary": "The EquipmentController coordinates HTTP requests and view rendering while delegating complex business rules and data manipulation to an EquipmentService and many focused Operation classes that work on model records like Equipment, Facility, Label, Gateway, and Profile — the class structure is intended to keep controllers thin and push domain logic into services/operations that act on the models for reuse and clearer responsibilities.",
+  "Relationships": [
+    {
+      "Model": [
+        "Equipment"
+      ],
+      "Description": "The controller builds or finds Equipment instances (or uses an EquipmentFactory) and initializes an EquipmentService (and EquipmentPresenter) around them to perform creation, updates, user bookkeeping, and to prepare data for views, keeping persistence and business logic out of controller actions."
+    },
+    {
+      "Operations": [
+        "AssignableOperations::AssignToOperation"
+      ],
+      "Description": "Controller actions for assigning equipment to profiles, projects, facilities or gateways call this operation with model ids and equipment collections, then use the operation result to redirect and show success or error messages."
+    },
+    {
+      "Operations": [
+        "TagsOperations::AssignTagsOperation",
+        "FoldersOperations::MoveToFolderOperation"
+      ],
+      "Description": "Tagging and moving-to-folder workflows are delegated to these operations so the controller only gathers params and handles the operation result (redirect/flash) instead of implementing the business steps inline."
+    },
+    {
+      "Operations": [
+        "EquipmentOperations::GenerateGatewayConfigurationOperation",
+        "EquipmentOperations::GetAvailableSoftwareVersionsOperation",
+        "EquipmentOperations::SearchOperation"
+      ],
+      "Description": "Specialized equipment operations generate configuration files, produce available firmware/software lists, and perform search; the controller calls them and streams files or returns JSON/html based on the operation outcome."
+    },
+    {
+      "Operations": [
+        "GatewaysOperations::FetchDownloadLinkOperation",
+        "GatewaysOperations::GenerateConfigOperation"
+      ],
+      "Description": "Gateway-specific operations are used to obtain external download links or generated config files, with the controller either redirecting to a link or sending the generated file to the client depending on success."
+    },
+    {
+      "Operations": [
+        "DataOperations::UserImportGenericDataFileOperation"
+      ],
+      "Description": "File-import logic (uploads tied to an equipment record) is handled by this operation; the controller passes files and context, then redirects with a background-import notice or shows import errors based on the result."
+    },
+    {
+      "Model": [
+        "Facility",
+        "Label",
+        "Profile",
+        "Project",
+        "Gateway",
+        "StorageUnit",
+        "EquipmentReservation",
+        "EquipmentProfile",
+        "EquipmentGateway",
+        "Product",
+        "Consumable"
+      ],
+      "Description": "The controller reads and updates these related models (usually via policy_scope) for tasks like defaulting facility, printing labels, assigning/unlinking profiles or gateways, managing reservations, exporting storage inventory CSVs, and cleaning up association records; controllers load these models and either pass them to services/operations or act on them lightly for response generation."
+    }
+  ]
+}

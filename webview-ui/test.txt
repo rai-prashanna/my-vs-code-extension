@@ -1,0 +1,20 @@
+Summarize the product’s features and use cases.
+Give a high-level overview of all functionalities and modules.
+Provide a complete feature catalog and descriptions.
+Executive summary of the product’s capabilities.
+Full list of modules and their use cases.
+Describe the system’s purpose and primary functionality.
+Comprehensive summary of features across the product.
+Generate an overview of all features and workflows.
+Provide a taxonomy of features and responsibilities.
+Briefly describe the application’s main modules and business use cases.
+What are the main product areas and what do they do?
+Create a one-paragraph product overview for stakeholders.
+What capabilities does this system provide end-to-end?
+Produce a product brief covering features, workflows, and integrations.
+Give a concise product summary suitable for a README or marketing brief.
+High-level description of modules, UI components, and integration points.
+Summarize all use cases and the features that support them.
+Generate a short product description that covers security, operations, and integrations.
+What is the product and what problems does it solve?
+Provide an overview of the system for a new team member.
