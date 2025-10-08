@@ -26,6 +26,7 @@ import { CSSTransition } from "react-transition-group";
 import "./fade.css"; // We'll define the fade CSS here
 import QAComponent, { QAItem } from "./QAComponent";
 import SpinnerComponent from "./MySpinner";
+import MermaidChart from "./MermaidChart";
 
 const markdown = `Answer Concise summary
 - SSO is implemented with Devise + OmniAuth-style callbacks routed to a custom OmniauthCallbacksController. Provider metadata (SAML vs OAuth2, domain lists, client ids/secrets, slo URL) lives in SsoProvider records and is accessed via SsoProvider.get_sso_provider_by_email.
@@ -293,16 +294,21 @@ export default function App() {
     setQaList((prev) => [...prev, newQA]);
   };
 
-  const updateAnswer = (index: number, chunk: string): void => {
-    setQaList((prev) =>
-      prev.map((item, i) =>
-        i === index ? { ...item, answer: item.answer + chunk } : item
-      )
-    );
-  };
+const updateAnswer = (index: number, chunk: string): void => {
+  setQaList((prev) =>
+    prev.map((item, i) =>
+      i === index
+        ? {
+            ...item,
+            answer: item.answer + chunk,
+          }
+        : item
+    )
+  );
+};
 
   useEffect(() => {
-    const ws = new WebSocket("ws://127.0.0.1:8000/ws/qa/stream");
+    const ws = new WebSocket("ws://127.0.0.1:8000/ws/stream");
     wsRef.current = ws;
 
     ws.onmessage = (event: MessageEvent) => {
@@ -341,7 +347,7 @@ export default function App() {
     wsRef.current?.send(raw_data);
     setAsked(question);
     setIsStreaming(true);
-    addQA({ asked: question, answer: "" });
+    addQA({ asked: question, answer: "",loading:loading });
   };
 
   const headerTemplate = () => {
@@ -366,6 +372,73 @@ export default function App() {
     load();
   };
 
+  const sampleDiagram = `
+\`\`\`mermaid
+graph TB  
+  subgraph Client  
+    direction TB  
+    Frontend["Frontend:Rails+React SPA"]:::client  
+  end  
+  
+  subgraph Backend  
+    direction TB  
+    Controller["Backend Controllers(app/controllers/*)"]:::backend  
+    Services["Backend Services(app/services/*)"]:::backend  
+    Models["Backend Models(app/models/*)"]:::backend  
+    Jobs["BackgroundJobs(app/jobs/*)"]:::backend  
+  end  
+  
+  subgraph Data  
+    direction TB  
+    PostgreSQL["PostgreSQL (pg)"]:::data  
+    Redis["Redis (cache/queue)"]:::data  
+    MinIO["MinIO/S3-compatible Storage"]:::data  
+    ClamAV["ClamAV"]:::data  
+  end  
+  
+  subgraph Infra  
+    direction TB  
+    Docker["Docker Containerization"]:::infra  
+    Registry["Image Registry(AWS/ECR)"]:::infra  
+    Kubernetes["Kubernetes/EKS(Helm)"]:::infra  
+    AzurePipelines["AzurePipelines"]:::infra  
+  end  
+  
+  subgraph External  
+    direction TB  
+    Twilio["Twilio-Ruby (SMS/Voice)"]:::external  
+    NewRelic["NewRelic"]:::external  
+    Errbit["Errbit"]:::external  
+  end  
+  
+  Frontend -->|REST API| Controller  
+  Controller -->|delegate to| Services  
+  Services -->|calls| Models  
+  Models -->|SQL| PostgreSQL  
+  Services -->|cache| Redis  
+  Services -->|enqueue| Jobs  
+  Jobs -->|execute| Models  
+  Controller -->|uploads| MinIO  
+  Services -->|scan| ClamAV  
+  Controller -->|notify| Twilio  
+  Services -->|metrics/traces| NewRelic  
+  Controller -->|log errors| Errbit  
+  
+  Docker -->|build/push image| Registry  
+  Registry -->|deploy to| Kubernetes    
+  AzurePipelines -->|build/push| Docker  
+  
+  classDef client fill:#ADD8E6,color:#000000;
+  classDef backend fill:#98FB98,color:#000000;
+  classDef data fill:#FFFACD,color:#000000;
+  classDef infra fill:#FFB6C1,color:#000000;
+  classDef external fill:#D3D3D3,color:#000000;
+
+`;
+// const parts = sampleDiagram.split(/```mermaid/);
+// const textBeforeMermaid = parts[0].trim();
+// const mermaidCode = parts[1]?.replace(/```$/, '').trim();
+
   return (
     <PrimeReactProvider>
       <div>
@@ -376,7 +449,7 @@ export default function App() {
           {answer && (
             <div>
               {qaList.map((qa, index) => (
-                <QAComponent asked={qa.asked} answer={qa.answer} />
+                <QAComponent asked={qa.asked} answer={qa.answer} loading={loading} />
               ))}
               {/* <QAComponent asked={asked} answer={answer}></QAComponent> */}
             </div>

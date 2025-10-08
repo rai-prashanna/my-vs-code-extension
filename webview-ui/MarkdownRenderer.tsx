@@ -23,25 +23,6 @@ const bottomRef = useRef<HTMLDivElement | null>(null);
       <ReactMarkdown>{content}</ReactMarkdown>
       <div ref={bottomRef} />
     </div>
-    // <div className="prose max-w-none">
-    //   <Image
-    //     className="inline"
-    //     src={Robot}
-    //     alt="Robot"
-    //     width="28px"
-    //     height="20px"
-    //   />
-    //   <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
-    // </div>
-
-    // <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-    //   <img className= "top-0 left-0"
-    //     src={Robot}
-    //     alt="Description"
-    //     style={{ width: "28px", height: "20px" }}
-    //   />
-    //   <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
-    // </div>
   );
 };
 
