@@ -56,7 +56,6 @@ graph TB
       {loading && <MarkdownRenderer content={answer} />}
       {!loading && (
         <>
-          <p>Hello</p>
           <MarkdownRenderer content={textBeforeMermaid} />
           {mermaidCode && (
             <>
