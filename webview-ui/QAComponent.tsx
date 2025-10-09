@@ -22,26 +22,20 @@ graph TB
 
   useEffect(() => {
     if (!loading) {
-      // --- Extract parts
-      const mermaidStartTag = "<mermaid>";
-      const mermaidEndTag = "</mermaid>";
+      const mermaidRegex = /<mermaid>([\s\S]*?)<\/mermaid>/g;
 
-      const mermaidStart = answer.indexOf(mermaidStartTag);
-      const mermaidEnd = answer.indexOf(mermaidEndTag);
+      const matches = [...answer.matchAll(mermaidRegex)];
 
-      // if (mermaidStart === -1 || mermaidEnd === -1) {
-      //   throw new Error("Mermaid section not found.");
-      // }
+      const mermaidCodes = matches.map((match) => match[1].trim());
 
-      const firstHalf = answer.slice(0, mermaidStart).trim(); // before <mermaid>
+      // Optional: Remove the Mermaid blocks from the original Markdown content
+      const markdownWithoutMermaid = answer.replace(mermaidRegex, "").trim();
 
-      const secondHalf = answer
-        .slice(mermaidStart + "<mermaid>".length, mermaidEnd)
-        .trim(); // inside <mermaid> ... </mermaid>
+      console.log("Markdown without Mermaid:\n", markdownWithoutMermaid);
+      console.log("Extracted Mermaid code blocks:\n", mermaidCodes);
 
-      console.log(secondHalf);
-      setTextBeforeMermaid(firstHalf);
-      setMermaidCode(String.raw`${secondHalf}`);
+      setTextBeforeMermaid(markdownWithoutMermaid);
+      setMermaidCode(String.raw`${mermaidCodes}`);
     }
   }, [loading]);
 
@@ -53,6 +47,7 @@ graph TB
         <div>{asked}</div>
       </div>
       <Divider />
+      {/* <MarkdownRenderer content={answer} /> */}
       {loading && <MarkdownRenderer content={answer} />}
       {!loading && (
         <>

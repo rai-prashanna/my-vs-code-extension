@@ -342,7 +342,6 @@ export default function App() {
     wsRef.current?.send(raw_data);
     setAsked(question);
     setIsStreaming(true);
-    addQA({ asked: question, answer: "" });
   };
 
   const headerTemplate = () => {
@@ -373,7 +372,7 @@ const sampleDiagram = `
   - On successful local sign-in, it sets cookies.permanent.encrypted[:username], queues UpdateTrackedFieldsJob, and handles subscription checks.
   - destroy (logout) preserves saml_uid/saml_session_index, calls generate_local_slo_logout_url (uses SsoProvider.get_sso_provider_by_email on current_user to derive provider and check idp_slo_target_url), deletes cookies, invalidates sessions, and then uses Devise’s sign out flow. After sign out it stores slo_logout_url in the session so after Devise clears the session the app can still redirect to the provider logout URL in after_sign_out_path_for.
 
-\`\`\`mermaid
+<mermaid>
 graph TB  
   subgraph Client  
     direction TB  
@@ -433,7 +432,7 @@ graph TB
   classDef data fill:#FFFACD,color:#000000;
   classDef infra fill:#FFB6C1,color:#000000;
   classDef external fill:#D3D3D3,color:#000000;
-
+</mermaid>
 `;
 const parts = sampleDiagram.split(/```mermaid/);
 const textBeforeMermaid = parts[0].trim();
@@ -443,8 +442,8 @@ const mermaidCode = parts[1]?.replace(/```$/, '').trim();
     <PrimeReactProvider>
       <div>
     <div style={{ padding: '2rem' }}>
-      <MarkdownRenderer content={textBeforeMermaid} />
-      <MermaidChart chart={mermaidCode} />
+          <MarkdownRenderer content={textBeforeMermaid} />
+          <MermaidChart chart={mermaidCode} />
     </div>
       </div>
     </PrimeReactProvider>

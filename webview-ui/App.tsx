@@ -449,7 +449,7 @@ graph TB
           {answer && (
             <div>
               {qaList.map((qa, index) => (
-                <QAComponent asked={qa.asked} answer={qa.answer} loading={loading} />
+                <QAComponent key={`${qa.asked}-${index}`} asked={qa.asked} answer={qa.answer} loading={loading} />
               ))}
               {/* <QAComponent asked={asked} answer={answer}></QAComponent> */}
             </div>
