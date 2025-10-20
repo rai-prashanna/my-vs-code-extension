@@ -309,7 +309,7 @@ const updateAnswer = (index: number, chunk: string,loading:boolean): void => {
 };
 
   useEffect(() => {
-    const ws = new WebSocket("ws://127.0.0.1:8000/ws/qa/stream");
+    const ws = new WebSocket("ws://127.0.0.1:8000/ws/stream");
     wsRef.current = ws;
 
     ws.onmessage = (event: MessageEvent) => {
@@ -317,10 +317,10 @@ const updateAnswer = (index: number, chunk: string,loading:boolean): void => {
       if (event.data === "#*✋🛑*#") {
         setLoading(false); // hide progress bar
         setIsStreaming(false); // stop streaming
-        
+        updateAnswer(qaList.length, "",false);         
       } else {
         setAnswer((prev) => prev + event.data);
-        updateAnswer(qaList.length, event.data,loading); 
+        updateAnswer(qaList.length, event.data,true); 
       }
     };
 
@@ -348,7 +348,8 @@ const updateAnswer = (index: number, chunk: string,loading:boolean): void => {
     wsRef.current?.send(raw_data);
     setAsked(question);
     setIsStreaming(true);
-    addQA({ asked: question, answer: "",loading:loading });
+    addQA({ asked: question, answer: "",loading:true });
+    
   };
 
   const headerTemplate = () => {
@@ -450,7 +451,7 @@ graph TB
           {answer && (
             <div>
               {qaList.map((qa, index) => (
-                <QAComponent key={`${qa.asked}-${index}`} asked={qa.asked} answer={qa.answer} loading={loading} />
+                <QAComponent key={`${qa.asked}-${index}`} asked={qa.asked} answer={qa.answer} loading={qa.loading} />
               ))}
               {/* <QAComponent asked={asked} answer={answer}></QAComponent> */}
             </div>
