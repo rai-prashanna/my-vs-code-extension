@@ -309,7 +309,7 @@ const updateAnswer = (index: number, chunk: string,loading:boolean): void => {
 };
 
   useEffect(() => {
-    const ws = new WebSocket("ws://127.0.0.1:8000/ws/stream");
+    const ws = new WebSocket("ws://127.0.0.1:8000/ws/qa/stream");
     wsRef.current = ws;
 
     ws.onmessage = (event: MessageEvent) => {

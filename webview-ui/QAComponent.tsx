@@ -5,62 +5,67 @@ import React, { useEffect, useState } from "react";
 import MarkdownRenderer from "./MarkdownRenderer";
 import MermaidChart from "./MermaidChart";
 
+// Type for each block of content (markdown or mermaid)
+type ContentBlock = {
+  type: "markdown" | "mermaid";
+  content: string;
+};
+
+// Props expected by the component
 export type QAItem = {
   asked: string;
   answer: string;
   loading: boolean;
 };
 
-function extractMermaidParts(input: string): {
-  beforeMermaid: string;
-  mermaidContent: string;
-  afterMermaid: string;
-} {
-  const mermaidRegex = /<mermaid>([\s\S]*?)<\/mermaid>/;
-  const mermaidMatch = input.match(mermaidRegex);
+// Function to parse multiple <mermaid> blocks and split the content
+function parseAnswerWithMermaidBlocks(input: string): ContentBlock[] {
+  const blocks: ContentBlock[] = [];
+  const mermaidRegex = /<mermaid>([\s\S]*?)<\/mermaid>/g;
 
-  if (mermaidMatch) {
-    const mermaidContent = mermaidMatch[1].trim();
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
 
-    const startIdx = mermaidMatch.index!;
-    const endIdx = startIdx + mermaidMatch[0].length;
+  while ((match = mermaidRegex.exec(input)) !== null) {
+    const matchStart = match.index;
+    const matchEnd = mermaidRegex.lastIndex;
 
-    const beforeMermaid = input.slice(0, startIdx).trim();
-    const afterMermaid = input.slice(endIdx).trim();
+    // Push markdown before this mermaid block
+    if (matchStart > lastIndex) {
+      const markdownText = input.slice(lastIndex, matchStart).trim();
+      if (markdownText) {
+        blocks.push({ type: "markdown", content: markdownText });
+      }
+    }
 
-    return { beforeMermaid, mermaidContent, afterMermaid };
-  } else {
-    // No <mermaid> block found
-    return {
-      beforeMermaid: input.trim(),
-      mermaidContent: "",
-      afterMermaid: "",
-    };
+    // Push the mermaid content
+    const mermaidContent = match[1].trim();
+    blocks.push({ type: "mermaid", content: mermaidContent });
+
+    lastIndex = matchEnd;
   }
+
+  // Push any remaining markdown after the last mermaid block
+  if (lastIndex < input.length) {
+    const remainingText = input.slice(lastIndex).trim();
+    if (remainingText) {
+      blocks.push({ type: "markdown", content: remainingText });
+    }
+  }
+
+  return blocks;
 }
 
 const QAComponent: React.FC<QAItem> = ({ asked, answer, loading }) => {
-  // Split the answer into text and mermaid code parts
-  const [textBeforeMermaid, setTextBeforeMermaid] = useState<string>("");
-  const [textAfterMermaid, setTextAfterMermaid] = useState<string>("");
-
-  const [mermaidCode, setMermaidCode] = useState<string | null>(null);
-
-  const sampleDiagram = `
-graph TB
-  A --> B
-`;
+  const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>([]);
 
   useEffect(() => {
     if (!loading) {
-      const parsed_answer = extractMermaidParts(answer);
-      console.log(parsed_answer);
-      setTextBeforeMermaid(parsed_answer.beforeMermaid);
-      setMermaidCode(String.raw`${parsed_answer.mermaidContent}`);
-      setTextAfterMermaid(parsed_answer.afterMermaid);
-
+      const parsedBlocks = parseAnswerWithMermaidBlocks(answer);
+      console.log(parsedBlocks); // Optional: debug output
+      setContentBlocks(parsedBlocks);
     }
-  }, [loading]);
+  }, [loading, answer]);
 
   return (
     <div>
@@ -70,19 +75,21 @@ graph TB
         <div>{asked}</div>
       </div>
       <Divider />
-      {/* <MarkdownRenderer content={answer} /> */}
+
+      {/* While loading, render the full answer as Markdown */}
       {loading && <MarkdownRenderer content={answer} />}
-      {!loading && (
-        <>
-          <MarkdownRenderer content={textBeforeMermaid} />
-          {mermaidCode && (
-            <>
-              <MermaidChart chart={mermaidCode} />
-            </>
-          )}
-          <MarkdownRenderer content={textAfterMermaid} />
-        </>
-      )}
+
+      {/* When not loading, render parsed blocks */}
+      {!loading &&
+        contentBlocks.map((block, index) => {
+          if (block.type === "markdown") {
+            return <MarkdownRenderer key={index} content={block.content} />;
+          } else if (block.type === "mermaid") {
+            return <MermaidChart key={index} chart={block.content} />;
+          } else {
+            return null;
+          }
+        })}
     </div>
   );
 };
