@@ -294,13 +294,14 @@ export default function App() {
     setQaList((prev) => [...prev, newQA]);
   };
 
-const updateAnswer = (index: number, chunk: string): void => {
+const updateAnswer = (index: number, chunk: string,loading:boolean): void => {
   setQaList((prev) =>
     prev.map((item, i) =>
       i === index
         ? {
             ...item,
             answer: item.answer + chunk,
+            loading:loading
           }
         : item
     )
@@ -319,7 +320,7 @@ const updateAnswer = (index: number, chunk: string): void => {
         
       } else {
         setAnswer((prev) => prev + event.data);
-        updateAnswer(qaList.length, event.data); 
+        updateAnswer(qaList.length, event.data,loading); 
       }
     };
 
@@ -461,7 +462,7 @@ graph TB
             style={{ height: "6px", width: "100%" }}
           />
         )}
-        {loading && (<SpinnerComponent loading={answer === ''}/>)}
+        {/* {loading && (<SpinnerComponent responding={isStreaming} thinking={answer==''} />)} */}
         <form onSubmit={handleSubmit}>
           <div className="flex items-center mt-2 ">
             <InputText
